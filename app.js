@@ -20,16 +20,21 @@ app.get('/', (req, res) => {
 //click restaurant and display detailed info
 app.get('/restaurants/:restaurant_id', (req, res) => {
   const restaurant = restaurantList.results.find(restaurant => restaurant.id.toString() === req.params.restaurant_id)
-  res.render('show', {restaurant: restaurant})
+  res.render('show', {restaurant})
 })
 
 //search, display restaurants
 app.get('/search', (req, res) => {
   const keyword = req.query.keyword.trim().toLowerCase()
+  const includesKeyword = (str) => str.toLowerCase().includes(keyword)
   const searchResult = restaurantList.results.filter(restaurant => {
-    return restaurant.name.toLowerCase().includes(keyword) || restaurant.category.toLowerCase().includes(keyword)
+    return includesKeyword(restaurant.name) || includesKeyword(restaurant.category)
   })
-  res.render('index', {restaurants: searchResult})
+  if (searchResult.length !== 0) {
+    res.render('index', { restaurants: searchResult })
+  }else if (searchResult.length === 0) {
+    res.render('noSearchResult', { restaurants: restaurantList.results, keyword})
+  }
 })
 
 
